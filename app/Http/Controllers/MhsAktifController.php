@@ -2,64 +2,76 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DetailSurat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\DetailSurat;
 use App\Models\Mahasiswa;
+use App\Models\PengajuanSurat;
+use App\Models\Staff;
+use App\Models\Kaprodi;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class MhsAktifController extends Controller
 {
     public function storeSurat1(Request $request)
-    {
-        // Validate the request with custom rules and messages
-        $request->validate([
-            'semester' => 'required|integer|min:1|max:14', // Semester between 1 and 14
-            'address' => 'required|string|min:5',          // Address min 5 characters
-            'purpose' => 'required|string|min:5',          // Purpose min 5 characters
-        ], [
-            'semester.required' => 'Semester wajib diisi.',
-            'semester.integer' => 'Semester harus berupa angka.',
-            'semester.min' => 'Semester minimal adalah 1.',
-            'semester.max' => 'Semester maksimal adalah 14.',
-            'address.required' => 'Alamat wajib diisi.',
-            'address.string' => 'Alamat harus berupa teks.',
-            'address.min' => 'Alamat minimal 5 karakter.',
-            'purpose.required' => 'Keperluan wajib diisi.',
-            'purpose.string' => 'Keperluan harus berupa teks.',
-            'purpose.min' => 'Keperluan minimal 5 karakter.',
+{
+    // Validasi request
+    $request->validate([
+        'semester' => 'required|integer|min:1|max:14',
+        'address' => 'required|string|min:5',
+        'purpose' => 'required|string|min:5',
+    ]);
+
+    // Ambil user yang sedang login
+    $user = Auth::user();
+
+    // Ambil data mahasiswa berdasarkan id_user
+    $mahasiswa = Mahasiswa::where('id_user', $user->id_user)->first();
+
+    if (!$mahasiswa) {
+        return redirect()->back()->with('error', 'Mahasiswa tidak ditemukan.');
+    }
+
+    try {
+        // Simpan data ke dalam tabel detail_surat
+        $detailSurat = DetailSurat::create([
+            'nama' => $mahasiswa->nama,
+            'kategori_surat' => 1,
+            'tanggal_surat' => now(),
+            'semester' => $request->semester,
+            'tujuan_surat' => $request->purpose,
+            'alamat_mhs' => $request->address,
         ]);
 
-        // Fetch the authenticated user
-        $user = Auth::user();
+        // Ambil staff dan kaprodi berdasarkan id_prodi mahasiswa
+        $staff = Staff::where('id_prodi', $mahasiswa->id_prodi)->first();
+        $kaprodi = Kaprodi::where('id_prodi', $mahasiswa->id_prodi)->first();
 
-        // Fetch the Mahasiswa record associated with the authenticated user
-        $mahasiswa = Mahasiswa::where('id_user', $user->id_user)->first();
-
-        // Check if the Mahasiswa record exists
-        if (!$mahasiswa) {
-            return redirect()->back()->with('error', 'Mahasiswa record not found for this user.');
+        if (!$staff || !$kaprodi) {
+            return redirect()->back()->with('error', 'Staff atau Kaprodi tidak ditemukan.');
         }
 
-        // Get nama from the Mahasiswa record
-        $nama = $mahasiswa->nama;
+        // Simpan data ke dalam tabel pengajuansurat
+        PengajuanSurat::create([
+            'status_surat' => 1,
+            'tanggal_perubahan' => now(),
+            'id_surat' => $detailSurat->id_surat,
+            'nrp' => $mahasiswa->nrp,
+            'id_staff' => $staff->id_staff,
+            'id_kaprodi' => $kaprodi->id_kaprodi,
+        ]);
 
-        // Create a new letter entry
-        try {
-            DetailSurat::create([
-                'nama' => $nama,
-                'kategori_surat' => 1,
-                'tanggal_surat' => now(),
-                'semester' => $request->semester,
-                'tujuan_surat' => $request->purpose,
-                'alamat_mhs' => $request->address,
-                'alamat_surat' => null,
-                'topik' => null,
-                'nama_kode_matkul' => null,
-            ]);
+        // Simpan data dalam session agar bisa ditampilkan di view
+        session()->flash('nama', $mahasiswa->nama);
+        session()->flash('nrp', $mahasiswa->nrp);
+        session()->flash('semester', $request->semester);
+        session()->flash('address', $request->address);
+        session()->flash('purpose', $request->purpose);
 
-            return redirect()->back()->with('success', 'Letter data submitted successfully!');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to submit letter data: ' . $e->getMessage());
-        }
+        return redirect()->back()->with('success', 'Surat berhasil diajukan.');
+
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Gagal menyimpan data: ' . $e->getMessage());
     }
+}
 }

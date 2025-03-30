@@ -2,22 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller; // Ensure this is imported
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Login Controller
-    |--------------------------------------------------------------------------
-    |
-bat    | This controller handles authenticating users for the application and
-    | redirecting them to their respective dashboards based on their role.
-    |
-    */
-
     // Show the login form
     public function showLoginForm()
     {
@@ -35,19 +25,23 @@ bat    | This controller handles authenticating users for the application and
 
         // Attempt to log the user in
         if (Auth::attempt(['id_user' => $credentials['id_user'], 'password' => $credentials['password']])) {
+            $user = Auth::user();
+            
+            // Store user data in session
+            session([
+                'id_user' => $user->id_user,
+                'role' => $user->role,
+                'name' => $user->name, // Assuming user has a 'name' field
+            ]);
+
             // Authentication successful, redirect based on role
-            if (Auth::user()->role == 'admin') {
-                return redirect('/admin');
-            }
-            else if (Auth::user()->role == 'student') {
-                return redirect('/student');
-            }
-            else if (Auth::user()->role == 'staff') {
-                return redirect('/staff');
-            }
-            else if (Auth::user()->role == 'kaprodi') {
-                return redirect('/kaprodi');
-            }
+            return match ($user->role) {
+                'admin' => redirect('/admin'),
+                'student' => redirect('/student'),
+                'staff' => redirect('/staff'),
+                'kaprodi' => redirect('/kaprodi'),
+                default => redirect('/'),
+            };
         }
 
         // Authentication failed, redirect back with error

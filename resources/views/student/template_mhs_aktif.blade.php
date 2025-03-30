@@ -55,11 +55,40 @@
                 </div>
             </div>
         </div>
+        <!-- Template Surat -->
+        <section class="bg-white flex flex-col items-center justify-center min-h-screen py-10">
+        <div class="bg-white shadow-lg rounded-lg p-10 w-full max-w-2xl ">
+            <div class="text-center mb-6">
+                <img src="{{ asset('images/maranatha_logo.png') }}" alt="" class="mx-auto h-20">
+                <h2 class="text-lg font-bold mt-2">UNIVERSITAS KRISTEN MARANATHA</h2>
+                <p class="text-sm">Fakultas Teknologi Informasi</p>
+                <p class="text-sm">Program Sarjana Teknik Informatika</p>
+            </div>
+            <h1 class="text-xl font-bold text-center">SURAT KETERANGAN</h1>
+            <p class="text-center mb-6">No. 139/KAPROG/S1IF/IV/2024</p>
 
-        <!-- Image Section -->
-        <div class="basis-1/2 p-6 flex items-center justify-center">
-            <img src="https://via.placeholder.com/600x800" alt="Template Surat"
-                class="max-w-full max-h-full object-contain">
+            <p class="mb-4">Yang bertanda tangan di bawah ini:</p>
+            <p><strong>Nama:</strong> Julianti Kasih, S.E., M.Kom.</p>
+            <p><strong>NIK:</strong> 720286</p>
+            <p><strong>Jabatan:</strong> Ketua Program Sarjana Teknik Informatika</p>
+
+            <p class="mt-4">Dengan ini menerangkan bahwa yang namanya tertera di bawah ini:</p>
+            <p><strong>Nama:</strong> {{ session('nama') ?? '-' }}</p>
+            <p><strong>NRP:</strong> {{ session('nrp') ?? '-' }}</p>
+            <p><strong>Semester:</strong> {{ session('semester') ?? '-' }}</p>
+            <p><strong>Alamat:</strong> {{ session('address') ?? '-' }}</p>
+            <p><strong>Keperluan:</strong> {{ session('purpose') ?? '-' }}</p>
+
+            <p class="mt-4">Adalah <strong>benar mahasiswa aktif</strong> di Program Sarjana Teknik Informatika Fakultas Teknologi Informasi pada Semester Genap 2023/2024, dan surat ini dibuat atas permohonan mahasiswa yang bersangkutan untuk keperluan <strong>{{ session('purpose') ?? '-' }}</strong>.</p>
+
+            <p class="mt-4">Demikian agar yang berkepentingan menjadi maklum dan surat ini dapat digunakan sebagaimana mestinya.</p>
+
+            <p class="mt-6 text-right">Bandung, {{ date('d F Y') }}</p>
+            <p class="text-right mt-2">Hormat Kami,</p>
+            <div class="text-right mt-10">
+                <p class="font-bold">Julianti Kasih, S.E., M.Kom.</p>
+                <p>Ketua Program Sarjana Teknik Informatika</p>
+            </div>
         </div>
     </section>
 @endsection

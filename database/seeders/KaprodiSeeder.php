@@ -24,18 +24,18 @@ class KaprodiSeeder extends Seeder
 
         // Create User record first (since Kaprodi depends on it)
         User::create([
-            'id_user' => 4001,
+            'id_user' => 4002,
             'password' => Hash::make('123456'),
             'role' => 'kaprodi',
         ]);
 
         // Now create Kaprodi record (after User is created)
         Kaprodi::create([
-            'id_kaprodi' => '001', // Use string since id_kaprodi is VARCHAR
+            'id_kaprodi' => '002', // Use string since id_kaprodi is VARCHAR
             'nama' => 'Robby',
             'email' => 'robby@gmail.com',
             'id_prodi' => 1,
-            'id_user' => 4001,
+            'id_user' => 4002,
         ]);
     }
 }

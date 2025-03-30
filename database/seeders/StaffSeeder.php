@@ -24,7 +24,7 @@ class StaffSeeder extends Seeder
 
         // Create User record first (since Staff depends on it)
         User::create([
-            'id_user' => 3001,
+            'id_user' => 3002,
             'password' => Hash::make('123456'),
             'role' => 'admin',
         ]);
@@ -35,7 +35,7 @@ class StaffSeeder extends Seeder
             'nama' => 'Joko',
             'email' => 'joko@gmail.com',
             'id_prodi' => 1,
-            'id_user' => 3001,
+            'id_user' => 3002,
         ]);
     }
 }
